@@ -142,7 +142,7 @@ class IPAddr
 
   def mask(prefixlen)
     a = @addr.unpack("C*")
-    i = prefixlen.div(8)
+    i = prefixlen.divmod(8)[0]             # mruby 1.0.0 lacks Integer#div
     if prefixlen % 8 != 0
       a[i] &= ~(0xff >> (prefixlen % 8))
       i += 1
