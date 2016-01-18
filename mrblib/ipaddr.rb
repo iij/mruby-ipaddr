@@ -112,7 +112,7 @@ class IPAddr
   end
 
   def hash
-    ((@addr + @mask).hash << 1) | (ipv4? ? 0 : 1)
+    @addr.hash ^ @mask.hash ^ @family.hash
   end
 
   def hton
