@@ -137,22 +137,22 @@ class IPAddr
   def include?(other)
     other = coerce_other(other)
     if ipv4_mapped?
-      if (@mask_addr >> 32) != 0xffffffffffffffffffffffff
+      if (@mask >> 32) != 0xffffffffffffffffffffffff
         return false
       end
-      mask_addr = (@mask_addr & IN4MASK)
+      mask_addr = (@mask & IN4MASK)
       addr = (@addr & IN4MASK)
       family = Socket::AF_INET
     else
-      mask_addr = @mask_addr
+      mask_addr = @mask
       addr = @addr
       family = @family
     end
     if other.ipv4_mapped?
-      other_addr = (other.to_i & IN4MASK)
+      other_addr = (other.hton & IN4MASK)
       other_family = Socket::AF_INET
     else
-      other_addr = other.to_i
+      other_addr = other.hton
       other_family = other.family
     end
 
