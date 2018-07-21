@@ -82,12 +82,12 @@ class IPAddr
   end
 
   # private
-  def _mask_to_i
+  def _int_mask
     @mask.unpack("N")[0]
   end
 
   # private
-  def _addr_to_i
+  def _int_addr
     @addr.unpack("N")[0]
   end
 
@@ -146,22 +146,22 @@ class IPAddr
   def include?(other)
     other = coerce_other(other)
     if ipv4_mapped?
-      if (_mask_to_i >> 32) != 0xffffffffffffffffffffffff
+      if (_int_mask >> 32) != 0xffffffffffffffffffffffff
         return false
       end
-      mask_addr = (_mask_to_i & IN4MASK)
-      addr = (_addr_to_i & IN4MASK)
+      mask_addr = (_int_mask & IN4MASK)
+      addr = (_int_addr & IN4MASK)
       family = Socket::AF_INET
     else
-      mask_addr = _mask_to_i
-      addr = _addr_to_i
+      mask_addr = _int_mask
+      addr = _int_addr
       family = @family
     end
     if other.ipv4_mapped?
-      other_addr = (other._addr_to_i & IN4MASK)
+      other_addr = (other._int_addr & IN4MASK)
       other_family = Socket::AF_INET
     else
-      other_addr = other._addr_to_i
+      other_addr = other._int_addr
       other_family = other.family
     end
 
@@ -225,7 +225,7 @@ class IPAddr
   end
 
   def ipv4_mapped?
-    return ipv6? && (_addr_to_i >> 32) == 0xffff
+    return ipv6? && (_int_addr >> 32) == 0xffff
   end
 
   # mruby extension
