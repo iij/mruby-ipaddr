@@ -109,3 +109,8 @@ end
 assert('IPAddr#~') do
   (~IPAddr.new('192.0.2.1')).to_s == '63.255.253.254'
 end
+
+assert('IPAddr#include?') do
+  IPAddr.new('192.168.2.0/24').include?('192.168.2.100')
+  !IPAddr.new('192.168.2.0/24').include?('192.168.3.100')
+end
