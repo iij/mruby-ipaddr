@@ -2,7 +2,6 @@ class IPAddr
   # @family is either AF_INET or AF_INET6.
   # @addr is a String represents IP address as an octet string.
   # @mask is a String represents netmask as an octet string.
-
   IN4MASK = 0xffffffff
 
   def initialize(addr='::', family=Socket::AF_UNSPEC)
@@ -82,6 +81,16 @@ class IPAddr
     @mask
   end
 
+  # private
+  def _mask_to_i
+    @mask.unpack("N")[0]
+  end
+
+  # private
+  def _addr_to_i
+    @addr.unpack("N")[0]
+  end
+
   #def &(other)
   #def <<(num)
 
@@ -137,22 +146,22 @@ class IPAddr
   def include?(other)
     other = coerce_other(other)
     if ipv4_mapped?
-      if (@mask >> 32) != 0xffffffffffffffffffffffff
+      if (_mask_to_i >> 32) != 0xffffffffffffffffffffffff
         return false
       end
-      mask_addr = (@mask & IN4MASK)
-      addr = (@addr & IN4MASK)
+      mask_addr = (_mask_to_i & IN4MASK)
+      addr = (_addr_to_i & IN4MASK)
       family = Socket::AF_INET
     else
-      mask_addr = @mask
-      addr = @addr
+      mask_addr = _mask_to_i
+      addr = _addr_to_i
       family = @family
     end
     if other.ipv4_mapped?
-      other_addr = (other.hton & IN4MASK)
+      other_addr = (other._addr_to_i & IN4MASK)
       other_family = Socket::AF_INET
     else
-      other_addr = other.hton
+      other_addr = other._addr_to_i
       other_family = other.family
     end
 
@@ -216,7 +225,7 @@ class IPAddr
   end
 
   def ipv4_mapped?
-    return ipv6? && (@addr >> 32) == 0xffff
+    return ipv6? && (_addr_to_i >> 32) == 0xffff
   end
 
   # mruby extension
