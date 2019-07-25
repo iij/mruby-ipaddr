@@ -1,14 +1,14 @@
-#include "mruby.h"
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include "mruby.h"
 #include "mruby/string.h"
 
 static mrb_value
 mrb_ipaddr_ntop(mrb_state *mrb, mrb_value klass)
-{ 
+{
   mrb_int af, n;
   char *addr, buf[50];
 
@@ -27,7 +27,7 @@ mrb_ipaddr_ntop(mrb_state *mrb, mrb_value klass)
 
 static mrb_value
 mrb_ipaddr_pton(mrb_state *mrb, mrb_value klass)
-{ 
+{
   mrb_int af, n;
   mrb_value s;
   char *bp, buf[50];
