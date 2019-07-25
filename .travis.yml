@@ -1,2 +1,81 @@
+language: c
+
+compiler:
+- gcc
+- clang
+- cl
+
+os:
+- linux
+- osx
+- windows
+
+dist: bionic
+osx_image: xcode11
+
+env:
+  global:
+  - MRUBY_REPOSITORY=https://github.com/mruby/mruby.git
+  - MRUBY_BRANCH=master
+  matrix:
+  - MRUBY_INT_SIZE=MRB_INT64
+  - MRUBY_INT_SIZE=MRB_INT32
+  - MRUBY_INT_SIZE=MRB_INT16
+
+matrix:
+  exclude:
+  - os: linux
+    compiler: cl
+  - os: osx
+    compiler: cl
+  allow_failures:
+  - os: windows
+    compiler: gcc
+  - os: windows
+    compiler: clang
+  - os: windows
+    compiler: cl
+  - env: MRUBY_INT_SIZE=MRB_INT16
+
+cache:
+  directories:
+  - win_flex_bison
+
+before_install:
+- |
+  if [ "${TRAVIS_OS_NAME}" = "windows" ]; then
+    if [ ! -f "win_flex_bison/bison.exe" ]; then
+      wget -O win_flex_bison.zip "https://github.com/lexxmark/winflexbison/releases/download/v2.5.18/win_flex_bison-2.5.18.zip"
+      7z x -y -owin_flex_bison win_flex_bison.zip
+      cp win_flex_bison/win_bison.exe win_flex_bison/bison.exe
+    fi
+
+    echo '@echo off'                                                              >  vs2017_rake.cmd
+    echo 'set PATH=%TRAVIS_BUILD_DIR%\win_flex_bison;%PATH%'                      >> vs2017_rake.cmd
+    echo 'set VS2017=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools' >> vs2017_rake.cmd
+    echo 'call "%VS2017%\VC\Auxiliary\Build\vcvars64.bat"'                        >> vs2017_rake.cmd
+    echo 'echo.'                                                                  >> vs2017_rake.cmd
+    echo 'echo rake %*'                                                           >> vs2017_rake.cmd
+    echo 'echo.'                                                                  >> vs2017_rake.cmd
+    echo 'rake %*'                                                                >> vs2017_rake.cmd
+
+    export RAKE='cmd //c vs2017_rake.cmd'
+  else
+    export RAKE='rake'
+  fi
+- |
+  if [ "${TRAVIS_OS_NAME}" = "osx" ] && [ "${TRAVIS_COMPILER}" = "gcc" ]; then
+    export CC=gcc-9
+    export CXX=gcc-9
+  fi
+
+before_script:
+- git clone --branch ${MRUBY_BRANCH} --depth 1 ${MRUBY_REPOSITORY} mruby
+- export MRUBY_TOOLCHAIN=${TRAVIS_COMPILER}
+- echo MRUBY_TOOLCHAIN=$MRUBY_TOOLCHAIN
+- echo MRUBY_INT_SIZE=$MRUBY_INT_SIZE
+- echo RAKE=$RAKE
+
 script:
-  - "ruby run_test.rb all test"
+- $RAKE all
+- $RAKE test

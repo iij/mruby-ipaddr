@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/iij/mruby-ipaddr.svg?branch=master)](https://travis-ci.org/iij/mruby-ipaddr)
+
 # mruby-ipaddr
 
 [IPAddr](http://www.ruby-doc.org/stdlib-2.0/libdoc/ipaddr/rdoc/IPAddr.html) class for mruby
