@@ -1,8 +1,15 @@
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#endif
+
+#include <string.h>
+
 #include "mruby.h"
 #include "mruby/string.h"
 
